@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Welcome to Hyper!</title>
+  <meta name="description" content="A cool app">
+  <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/public/style.css">
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+
+<body>
+  <header>
+    <h1 class="center" id='projectTitle'></h1>
+  </header>
+  <center>
+    <div id='submitNewIssue' class="card container">
+
+      <form id="newIssue" method="post" action="/api/">
+        <div class="card-content">
+          <span class="card-title">Submit a new issue:</span>
+          <div class="input-field">
+            <input id="issue_title" type="text" name="issue_title" required=''>
+            <label for="issue_title">*issue_title</label>
+          </div>
+          <div class="input-field">
+            <textarea type="text" name="issue_text" placeholder="*Text" required=''></textarea>
+          </div>
+          <div class="input-field">
+            <label for="created_by">*Created by</label>
+            <input type="text" id="created_by" name="created_by" required=''>
+          </div>
+          <div class="input-field">
+            <input id="assigned_to" type="text" name="assigned_to">
+            <label for="assigned_to">(optional) Assigned to</label>
+          </div>
+          <div class="input-field">
+            <input id="status_text" type="text" name="status_text">
+            <label for="status_text">(optional) Status text</label>
+          </div>
+        </div>
+        <div class="card-action">
+          <button class="waves-effect waves-light btn" type="submit">Submit Issue</button>
+        </div>
+      </form>
+    </div>
+    <br>
+    <div id='issueDisplay'></div>
+
+    <hr style='margin: 50px; margin-top: 200px'>
+  </center>
+
+  <script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+    crossorigin="anonymous"></script>
+  <script>
+    $(function () {
+      var currentProject = window.location.pathname.replace(/\//g, "");;
+      var url = "/api/issues/" + currentProject;
+      $('#projectTitle').text('All issues for: ' + currentProject)
+      $.ajax({
+        type: "GET",
+        url: url,
+        success: function (data) {
+          var issues = [];
+          data.forEach(function (ele) {
+            console.log(ele);
+            var openstatus;
+            (ele.open) ? openstatus = 'open' : openstatus = 'closed';
+            var single = [
+              '<div class="issue ' + openstatus + '">',
+              '<p class="id">id: ' + ele._id + '</p>',
+              '<h3>' + ele.issue_title + ' -  (' + openstatus + ')</h3>',
+              '<br>',
+              '<p>' + ele.issue_text + '</p>',
+              '<p>' + ele.status_text + '</p>',
+              '<br>',
+              '<p class="id"><b>Created by:</b> ' + ele.created_by + '  <b>Assigned to:</b> ' + ele.assigned_to,
+              '<p class="id"><b>Created on:</b> ' + ele.created_on + '  <b>Last updated:</b> ' + ele.updated_on,
+              '<br><a href="#" class="closeIssue" id="' + ele._id + '">close?</a> <a href="#" class="deleteIssue" id="' + ele._id + '">delete?</a>',
+              '</div>'
+
+            ];
+            issues.push(single.join(''));
+          });
+          $('#issueDisplay').html(issues.join(''));
+        }
+      });
+
+      $('#newIssue').submit(function (e) {
+        e.preventDefault();
+        $(this).attr('action', "/api/issues/" + currentProject);
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: $(this).serialize(),
+          success: function (data) { window.location.reload(true); }
+        });
+      });
+
+      $('#issueDisplay').on('click', '.closeIssue', function (e) {
+        var url = "/api/issues/" + currentProject;
+        $.ajax({
+          type: "PUT",
+          url: url,
+          data: { _id: $(this).attr('id'), open: false },
+          success: function (data) { alert(data); window.location.reload(true); }
+        });
+        e.preventDefault();
+      });
+      $('#issueDisplay').on('click', '.deleteIssue', function (e) {
+        var url = "/api/issues/" + currentProject;
+        $.ajax({
+          type: "DELETE",
+          url: url,
+          data: { _id: $(this).attr('id') },
+          success: function (data) { alert(data); window.location.reload(true); }
+        });
+        e.preventDefault();
+      });
+    });
+  </script>
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>

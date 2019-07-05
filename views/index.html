@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Welcome to Hyper!</title>
+  <meta name="description" content="A cool app">
+  <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--Import Google Icon Font-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    #show-response-btn {
+      position: fixed;
+      top: 85%;
+      left: 85%;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="center">
+    <h1>
+      ISQA - Issue Tracker
+    </h1>
+  </header>
+  <div id='userstories' style='margin-left: 5%; margin-top: 5%'>
+    <h4>User Stories</h4>
+    <ol>
+      <li>Prevent cross site scripting(XSS attack).</li>
+      <li>I can <b>POST</b> <code>/api/issues/{projectname}</code> with form data containing required <i>issue_title</i>,
+        <i>issue_text</i>, <i>created_by</i>, and optional <i>assigned_to</i> and <i>status_text</i>.</li>
+      <li>The object saved (and returned) will include all of those fields (blank for optional no input) and also
+        include <i>created_on</i>(date/time), <i>updated_on</i>(date/time), <i>open</i>(boolean, true for open, false
+        for closed), and <i>_id</i>.</li>
+      <li>I can <b>PUT</b> <code>/api/issues/{projectname}</code> with a <i>_id</i> and any fields in the object with a
+        value to object said object. Returned will be 'successfully updated' or 'could not update '+_id. This should
+        always update <i>updated_on</i>. If no fields are sent return 'no updated field sent'.</li>
+      <li>I can <b>DELETE</b> <code>/api/issues/{projectname}</code> with a <i>_id</i> to completely delete an issue.
+        If no _id is sent return '_id error', success: 'deleted '+_id, failed: 'could not delete '+_id.</li>
+      <li>I can <b>GET</b> <code>/api/issues/{projectname}</code> for an array of all issues on that specific project
+        with all the information for each issue as was returned when posted.</li>
+      <li>I can filter my get request by also passing along any field and value in the query(ie. <code>/api/issues/{project}?open=false</code>).
+        I can pass along as many fields/values as I want.</li>
+      <li>All 11 functional tests are complete and passing.</li>
+    </ol>
+    <br>
+    <h4>Example get usage:</h4>
+    <code>/api/issues/{project}</code><br>
+    <code>/api/issues/{project}?open=true&amp;assigned_to=Joe</code><br>
+    <h4>Example return:</h4>
+    <code>[{"_id":"5871dda29faedc3491ff93bb","issue_title":"Fix error in posting data","issue_text":"When we post data it has an error.","created_on":"2017-01-08T06:35:14.240Z","updated_on":"2017-01-08T06:35:14.240Z","created_by":"Joe","assigned_to":"Joe","open":true,"status_text":"In QA"},...]</code>
+    <br><br>
+    <h3><a href='/apitest/'>EXAMPLE: Go to <i>/apitest/</i> project issues</a></h3>
+  </div>
+  <hr style='margin: 50px'>
+
+
+  <div id='testui' class="container" style='margin-left: 5%'>
+    <h2 class="center">API Tests:</h2>
+
+    <div class="container form-card">
+      <h4>Submit issue on <i>apitest</i></h4>
+      <form id="testForm" class="border">
+        <div class="input-field">
+          <label for="issue_title">*issue_title</label>
+          <input type="text" id="issue_title" name="issue_title" required=''>
+        </div>
+        <div class="input-field">
+          <textarea type="text" name="issue_text" placeholder="*Text" required=''></textarea>
+        </div>
+        <div class="input-field">
+          <label for="created_by">*Created by</label>
+          <input type="text" id="created_by" name="created_by" required=''>
+        </div>
+        <div class="input-field">
+          <label for="assigned_to">(optional) Assigned to</label>
+          <input type="text" id="assigned_to" name="assigned_to">
+        </div>
+        <div class="input-field">
+          <label for="status_text">(optional) Status text</label>
+          <input type="text" id="status_text" name="status_text">
+        </div>
+        <button class="waves-effect waves-light btn" type="submit">Submit Issue</button>
+      </form><br>
+      <h4>Update issue on <i>apitest</i> (Change any or all to update issue on the _id supplied)</h4>
+    </div>
+
+    <div class="container form-card">
+      <form id="testForm2" class="border">
+        <div class="input-field">
+          <label for="_id2">*_id</label>
+          <input type="text" id="_id2" name="_id" required=''>
+        </div>
+        <div class="input-field">
+          <label for="issue_title2">(optional) Title</label>
+          <input type="text" id="issue_title2" name="issue_title">
+        </div>
+        <div class="input-field">
+          <textarea type="text" name="issue_text" placeholder="(optional) Text"></textarea>
+        </div>
+        <div class="input-field">
+          <label for="created_by2">(optional) Created by</label>
+          <input type="text" id="created_by2" name="created_by">
+        </div>
+        <div class="input-field">
+          <label for="assigned_to2">(optional) Assigned to</label>
+          <input type="text" id="assigned_to2" name="assigned_to">
+        </div>
+        <div class="input-field">
+          <label for="status_text2">(optional) Status text</label>
+          <input type="text" id="status_text2" name="status_text">
+        </div>
+
+        <p><label><input type="checkbox" name="open" value=false /> <span>Check to close issue</span></label></p>
+        <button class="waves-effect waves-light btn" type="submit">Submit Issue</button>
+      </form><br>
+    </div>
+
+    <div class="container form-card">
+      <h4>Delete issue on <i>apitest</i></h4>
+      <form id="testForm3" class="border">
+        <div class="input-field">
+          <label for="_id3">_id</label>
+          <input type="text" id="_id3" name="_id" required=''>
+        </div>
+        <button class="waves-effect waves-light btn " type="submit">Delete Issue</button>
+      </form>
+    </div>
+
+    <!-- Modal Trigger -->
+    <button id="show-response-btn" data-target="modal1" class="btn-floating btn-large waves-effect waves-light modal-trigger">
+      <i class="material-icons">add</i>
+    </button>
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal bottom-sheet">
+      <div class="modal-content">
+        <h4>Server response:</h4>
+        <p><code id='jsonResult'></code></p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
+    </div>
+    <br>
+
+  </div>
+
+  <!-- Your web-app is https, so your scripts need to be too -->
+  <script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+    crossorigin="anonymous"></script>
+  <script>
+    function createAjaxParam(type, formQuery) {
+      return {
+        url: '/api/issues/apitest',
+        type: type,
+        data: $(formQuery).serialize(),
+        success: function (data) {
+          $('#jsonResult').text(JSON.stringify(data));
+          $('.modal').modal('open');
+        },
+        error: function (data) {
+          $('#jsonResult').text(data.responseText);
+          $('.modal').modal('open');
+        }
+      }
+    }
+    $(function () {
+      $('.modal').modal();
+
+      $('#testForm').submit(function (e) {
+        $.ajax(createAjaxParam('post', '#testForm'));
+        e.preventDefault();
+      });
+      $('#testForm2').submit(function (e) {
+        $.ajax(createAjaxParam('put', '#testForm2'));
+        e.preventDefault();
+      });
+      $('#testForm3').submit(function (e) {
+        $.ajax(createAjaxParam('delete', '#testForm3'));
+        e.preventDefault();
+      });
+    });
+  </script>
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>
